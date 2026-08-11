@@ -1,28 +1,39 @@
-# E-Commerce AI Business Intelligence
+# 🛒 E-Commerce AI Business Intelligence
 
-An explainable AI-driven business intelligence platform for e-commerce customer analytics, churn prediction, customer lifetime value optimization, sales forecasting, and LLM-assisted decision support.
+> An end-to-end Data Mining and Business Intelligence project built using the Brazilian E-Commerce Public Dataset by Olist. The project focuses on data understanding, data cleaning, analytical data modeling, PostgreSQL data warehousing, business intelligence, and AI-assisted business insights.
 
-## Project Status
+---
 
-🚧 Currently in development
+## 📌 Project Overview
 
-## Dataset
+This project analyzes an e-commerce dataset containing information about customers, orders, products, sellers, payments, reviews, and geographical locations.
 
-Olist Brazilian E-Commerce Dataset
+The goal is to transform raw e-commerce data into a structured analytical system that can answer important business questions related to:
 
-## Technologies
+- Sales performance
+- Customer behavior
+- Product performance
+- Seller performance
+- Payment behavior
+- Delivery performance
+- Customer reviews
+- Geographic patterns
 
-- Python
-- PostgreSQL
-- Pandas
-- NumPy
-- Scikit-learn
-- XGBoost
-- LightGBM
-- Prophet
-- SHAP
-- MLflow
-- FastAPI
-- Streamlit
-- Docker
-- Git & GitHub
+The project follows a complete data pipeline:
+
+```text
+Raw Data
+   ↓
+Data Understanding
+   ↓
+Data Cleaning & Transformation
+   ↓
+PostgreSQL Database
+   ↓
+Data Warehouse / Star Schema
+   ↓
+SQL Analytics
+   ↓
+Business Intelligence
+   ↓
+AI-Assisted Business Insights
