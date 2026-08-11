@@ -1,39 +1,30 @@
 # 🛒 E-Commerce AI Business Intelligence
 
-> An end-to-end Data Mining and Business Intelligence project built using the Brazilian E-Commerce Public Dataset by Olist. The project focuses on data understanding, data cleaning, analytical data modeling, PostgreSQL data warehousing, business intelligence, and AI-assisted business insights.
+> An end-to-end data mining and business intelligence project using e-commerce data to uncover meaningful business insights.
 
----
+## 🎯 Objectives
 
-## 📌 Project Overview
+- Perform data mining and exploratory analysis on e-commerce data.
+- Understand and analyze relationships between customers, orders, products, sellers, payments, reviews, and locations.
+- Clean and transform raw data into analysis-ready datasets.
+- Design and implement an analytical data warehouse using PostgreSQL.
+- Perform SQL-based business analysis and generate meaningful insights.
+- Develop visualizations and an interactive business intelligence dashboard.
+- Apply AI-assisted analysis to generate business insights and recommendations.
 
-This project analyzes an e-commerce dataset containing information about customers, orders, products, sellers, payments, reviews, and geographical locations.
+## 📌 Progress
 
-The goal is to transform raw e-commerce data into a structured analytical system that can answer important business questions related to:
-
-- Sales performance
-- Customer behavior
-- Product performance
-- Seller performance
-- Payment behavior
-- Delivery performance
-- Customer reviews
-- Geographic patterns
-
-The project follows a complete data pipeline:
-
-```text
-Raw Data
-   ↓
-Data Understanding
-   ↓
-Data Cleaning & Transformation
-   ↓
-PostgreSQL Database
-   ↓
-Data Warehouse / Star Schema
-   ↓
-SQL Analytics
-   ↓
-Business Intelligence
-   ↓
-AI-Assisted Business Insights
+- [x] Project setup
+- [x] Git and GitHub repository setup
+- [x] Python virtual environment setup
+- [x] PostgreSQL and Docker setup
+- [x] Raw dataset collection
+- [x] Dataset exploration and profiling
+- [x] Data type analysis
+- [x] Missing-value analysis
+- [x] Duplicate analysis
+- [x] Key and relationship analysis
+- [x] Referential integrity checks
+- [x] Data grain analysis
+- [x] Date and numerical distribution analysis
+- [x] Initial data-quality assessment
