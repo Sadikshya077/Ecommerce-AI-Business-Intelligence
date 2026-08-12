@@ -14,9 +14,9 @@ import pandas as pd
 from etl.config import DATE_COLUMNS
 from etl.logger import logger
 from etl.report import RunReport
-from typing import Dict
+# from typing import Dict
 
-def transform(tables: Dict[str, pd.DataFrame], report: RunReport) -> dict[str, pd.DataFrame]:
+def transform(tables: dict[str, pd.DataFrame], report: RunReport) -> dict[str, pd.DataFrame]:
     logger.info("STAGE: transform")
 
     cleaned = {

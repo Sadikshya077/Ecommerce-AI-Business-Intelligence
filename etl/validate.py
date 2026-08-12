@@ -13,7 +13,7 @@ from etl.config import PRIMARY_KEYS
 from etl.exceptions import ETLError
 from etl.logger import logger
 from etl.report import RunReport
-
+# from typing import Dict
 
 def validate(tables: dict[str, pd.DataFrame], report: RunReport) -> None:
     logger.info("STAGE: validate")

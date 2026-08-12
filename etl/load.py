@@ -12,9 +12,9 @@ import pandas as pd
 
 from etl.config import PROCESSED_DIR, PROJECT_ROOT
 from etl.logger import logger
-from typing import Dict
+# from typing import Dict
 
-def load(tables: Dict[str, pd.DataFrame]) -> None:
+def load(tables: dict[str, pd.DataFrame]) -> None:
     logger.info("STAGE: load")
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
