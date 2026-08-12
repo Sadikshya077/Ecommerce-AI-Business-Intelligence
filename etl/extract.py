@@ -13,8 +13,8 @@ from etl.exceptions import ETLError
 from etl.logger import logger
 from etl.report import RunReport
 
-
-def extract(report: RunReport) -> dict[str, pd.DataFrame]:
+from typing import Dict
+def extract(report: RunReport) -> Dict[str, pd.DataFrame]:
     """Read all raw CSVs into a dict of DataFrames keyed by table name."""
     logger.info("STAGE: extract")
     if not RAW_DIR.exists():
@@ -23,7 +23,7 @@ def extract(report: RunReport) -> dict[str, pd.DataFrame]:
             f"Download the Olist dataset and place the CSVs there first."
         )
 
-    tables: dict[str, pd.DataFrame] = {}
+    tables: Dict[str, pd.DataFrame] = {}
     missing = []
     for name, filename in RAW_FILES.items():
         path = RAW_DIR / filename
