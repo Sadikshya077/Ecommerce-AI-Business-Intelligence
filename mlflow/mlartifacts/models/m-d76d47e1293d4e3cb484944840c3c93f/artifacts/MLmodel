@@ -1,0 +1,23 @@
+artifact_path: file:C:\Users\Ruby\Ecommerce-AI-Business-Intelligence\mlflow\mlartifacts/models/m-d76d47e1293d4e3cb484944840c3c93f/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.skops
+    predict_fn: predict
+    python_version: 3.13.12
+  sklearn:
+    code: null
+    pickled_model: model.skops
+    serialization_format: skops
+    sklearn_version: 1.9.0
+    skops_trusted_types: null
+mlflow_version: 3.15.1
+model_id: m-d76d47e1293d4e3cb484944840c3c93f
+model_size_bytes: 9409
+model_uuid: m-d76d47e1293d4e3cb484944840c3c93f
+prompts: null
+run_id: dabd4b27b0ad48b3a70f576f550aa2f8
+utc_time_created: '2026-08-14 01:20:25.780330'

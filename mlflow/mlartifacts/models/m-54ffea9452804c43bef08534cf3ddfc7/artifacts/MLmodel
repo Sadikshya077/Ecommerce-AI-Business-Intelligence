@@ -1,0 +1,22 @@
+artifact_path: file:C:\Users\Ruby\Ecommerce-AI-Business-Intelligence\mlflow\mlartifacts/models/m-54ffea9452804c43bef08534cf3ddfc7/artifacts
+flavors:
+  python_function:
+    data: model.ubj
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.xgboost
+    python_version: 3.13.12
+  xgboost:
+    code: null
+    data: model.ubj
+    model_class: xgboost.sklearn.XGBClassifier
+    model_format: ubj
+    xgb_version: 3.4.0
+mlflow_version: 3.15.1
+model_id: m-54ffea9452804c43bef08534cf3ddfc7
+model_size_bytes: 478014
+model_uuid: m-54ffea9452804c43bef08534cf3ddfc7
+prompts: null
+run_id: 37d1462254254f4292485e156e7cf278
+utc_time_created: '2026-08-14 01:20:46.351069'
