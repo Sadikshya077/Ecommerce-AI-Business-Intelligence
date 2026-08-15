@@ -1,23 +1,6 @@
-"""
-features/product_features.py
-
-Builds order-level basket data for association rule mining
-(FP-Growth, Phase 3) and basic category summary statistics.
-
-Output:
-    data/processed/features/order_baskets.parquet
-        Long format, one row per (order_id, category_name_english).
-        Phase 3's association_rules script pivots this into a one-hot
-        transaction matrix via mlxtend.preprocessing.TransactionEncoder.
-
-    data/processed/features/category_summary.parquet
-        One row per category: order count, item count, avg price,
-        total revenue. Useful for sanity-checking association rules
-        and for dashboard category breakdowns later.
-
-Run from project root:
-    python -m features.product_features
-"""
+# Build order-level basket data and category summary features
+# Order baskets are used later for association rule mining
+# Category summaries provide basic revenue and product statistics
 
 import logging
 from pathlib import Path
@@ -43,11 +26,13 @@ WHERE p.category_name_english IS NOT NULL AND p.category_name_english != 'unknow
 """
 
 
+# Create a unique list of categories purchased in each order
 def build_order_baskets(df: pd.DataFrame) -> pd.DataFrame:
     baskets = df[["order_id", "category_name_english"]].drop_duplicates()
     return baskets
 
 
+# Calculate order, item, price, and revenue statistics for each category
 def build_category_summary(df: pd.DataFrame) -> pd.DataFrame:
     summary = (
         df.groupby("category_name_english")
@@ -63,6 +48,7 @@ def build_category_summary(df: pd.DataFrame) -> pd.DataFrame:
     return summary
 
 
+# Load warehouse data and generate the product-level feature files
 def run():
     engine = get_engine()
     logger.info("Querying warehouse for order-item/category data...")

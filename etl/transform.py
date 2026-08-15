@@ -1,7 +1,4 @@
-"""
-etl/transform.py
-==================
-Stage 3 of the pipeline: clean each raw table.
+"""Cleans each raw table.
   - dedupe on primary key
   - standardize date dtypes
   - handle missing values with explicit, documented rules
