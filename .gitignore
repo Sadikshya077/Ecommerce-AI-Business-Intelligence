@@ -17,6 +17,14 @@ data/processed/
 
 # MLflow
 mlruns/
+mlflow/
+
+# Model artifacts (large binaries -- track via MLflow, not git)
+*.pkl
+*.joblib
+*.h5
+*.pt
+*.onnx
 
 # VS Code
 .vscode/
