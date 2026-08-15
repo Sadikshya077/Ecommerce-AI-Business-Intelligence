@@ -1,6 +1,4 @@
 """
-etl/logger.py
-==============
 Single shared logger for the pipeline. Every other etl/ module does:
 
     from etl.logger import logger

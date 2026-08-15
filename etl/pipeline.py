@@ -1,12 +1,6 @@
 """
-etl/pipeline.py
-=================
 Orchestrates the full ETL run: extract -> validate -> transform -> load.
 This is the only module you actually execute.
-
-Run from the project root:
-
-    python -m etl.pipeline
 """
 
 from etl.config import PROJECT_ROOT

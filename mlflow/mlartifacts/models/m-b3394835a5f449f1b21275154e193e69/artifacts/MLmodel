@@ -1,0 +1,27 @@
+artifact_path: file:C:\Users\Ruby\Ecommerce-AI-Business-Intelligence\mlflow\mlartifacts/models/m-b3394835a5f449f1b21275154e193e69/artifacts
+flavors:
+  lightgbm:
+    code: null
+    data: model.skops
+    lgb_version: 4.7.0
+    model_class: lightgbm.sklearn.LGBMRegressor
+    serialization_format: skops
+    skops_trusted_types:
+    - collections.OrderedDict
+    - lightgbm.basic.Booster
+    - lightgbm.sklearn.LGBMRegressor
+    - lightgbm.sklearn.LGBMClassifier
+  python_function:
+    data: model.skops
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.lightgbm
+    python_version: 3.13.12
+mlflow_version: 3.15.1
+model_id: m-b3394835a5f449f1b21275154e193e69
+model_size_bytes: 563318
+model_uuid: m-b3394835a5f449f1b21275154e193e69
+prompts: null
+run_id: 05c333494f59434eb56b33a56a448739
+utc_time_created: '2026-08-15 04:47:22.051183'
