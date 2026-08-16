@@ -1,31 +1,10 @@
 """
 models/churn/churn_window.py
 
-Derives a data-driven churn window (N days) rather than choosing one
-arbitrarily: computes the distribution of days between consecutive
-orders for repeat customers, and sets the churn window at the 90th
-percentile of that distribution -- a customer who has gone longer
-than 90% of observed repeat-purchase gaps without buying again is
-treated as having likely churned.
+Derives the churn window from the 90th percentile of repeat-purchase
+gaps and cross-checks it against the Phase 3 segmentation results.
 
-Cross-checked against the Phase 3 segmentation result: the "lapsed
-one-time buyers" segment's average recency should land in a similar
-range if the two independent analyses (clustering vs. gap
-distribution) are telling a consistent story.
-
-LIMITATION: this dataset is right-censored -- customers whose most
-recent purchase falls near the end of the observed window haven't
-had a fair chance to make a second purchase yet, and may be
-mislabeled "churned" simply because the data collection stopped
-early. This is a known limitation of applying a static churn window
-to a fixed historical dataset; worth stating explicitly rather than
-treating the label as ground truth.
-
-Set CHURN_WINDOW_OVERRIDE to an int to bypass the calculation after
-reviewing the diagnostics -- the computed distribution is still
-logged either way, so the choice stays documented.
-
-Run standalone for diagnostics only:
+Run standalone:
     python -m models.churn.churn_window
 """
 
