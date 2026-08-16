@@ -19,7 +19,7 @@ def load_forecast_summary() -> Optional[dict]:
     with open(path) as f:
         return json.load(f)
 
-# Fixed mapping from Phase 3's k=4 segmentation result -- see reports/methodology_phase3.md
+# Fixed mapping from k=4 segmentation result
 SEGMENT_LABELS = {
     0: "Lapsed one-time buyers",
     1: "Recent one-time buyers",
