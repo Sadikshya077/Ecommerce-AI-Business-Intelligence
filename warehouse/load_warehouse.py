@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from db import get_engine
+from warehouse.db import get_engine
 
 PROCESSED_DIR = Path(__file__).resolve().parent.parent / "data" / "processed"
 

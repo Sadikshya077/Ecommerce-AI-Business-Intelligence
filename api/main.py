@@ -10,13 +10,13 @@ from api.config import get_settings
 from api.data_store import store
 from api.exceptions import register_exception_handlers
 from api.middleware import RequestLoggingMiddleware
-from api.routers import health
+from api.routers import churn, clv, customers, forecast, health, insights, segments
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
 logger = logging.getLogger("api")
 
 
-# Load all model outputs before the API starts accepting requests.
+# Loads all model outputs into memory once, before the app starts accepting requests
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     store.load()
@@ -33,7 +33,6 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Configure CORS for the allowed frontend origins and request methods.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -42,8 +41,15 @@ app.add_middleware(
 )
 app.add_middleware(RequestLoggingMiddleware)
 
-# Register the application's custom exception handlers.
 register_exception_handlers(app)
 
-# Register the health and readiness endpoints.
+# Health/readiness stay unversioned (design assumption -- standard practice
+# for infra-level liveness checks, distinct from the API contract itself).
+# Everything else mounts under /api/v1 per the API versioning requirement.
 app.include_router(health.router)
+app.include_router(customers.router, prefix="/api/v1")
+app.include_router(segments.router, prefix="/api/v1")
+app.include_router(churn.router, prefix="/api/v1")
+app.include_router(clv.router, prefix="/api/v1")
+app.include_router(insights.router, prefix="/api/v1")
+app.include_router(forecast.router, prefix="/api/v1")

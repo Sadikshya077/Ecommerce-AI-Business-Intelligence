@@ -19,6 +19,18 @@ def load_forecast_summary() -> Optional[dict]:
     with open(path) as f:
         return json.load(f)
 
+
+# Segment profile (Phase 3's k=4 result) is also global, one row per
+# segment, not customer-indexed -- soft-loaded like forecast_summary rather
+# than added to the hard required-files check, since it's supplementary
+def load_segment_profile() -> list:
+    path = DATA_DIR / "segment_profile.parquet"
+    if not path.exists():
+        return []
+    profile = pd.read_parquet(path)
+    profile["segment_label"] = profile["segment_id"].map(SEGMENT_LABELS)
+    return profile.to_dict(orient="records")
+
 # Fixed mapping from k=4 segmentation result
 SEGMENT_LABELS = {
     0: "Lapsed one-time buyers",
@@ -34,6 +46,7 @@ class CustomerStore:
     def __init__(self):
         self._df: Optional[pd.DataFrame] = None
         self.forecast_summary: Optional[dict] = None
+        self.segment_profile: list = []
 
     # Merges churn, CLV, and SHAP outputs into a single lookup table
     def load(self):
@@ -71,6 +84,7 @@ class CustomerStore:
         df["segment_label"] = df["segment_id"].map(SEGMENT_LABELS)
         self._df = df.set_index("customer_unique_id")
         self.forecast_summary = load_forecast_summary()
+        self.segment_profile = load_segment_profile()
         return self
 
     # Returns one customer's merged record as a dict, or None if not found

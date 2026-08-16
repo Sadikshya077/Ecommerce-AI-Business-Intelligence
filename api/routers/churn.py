@@ -1,28 +1,21 @@
 """api/routers/churn.py"""
 
-import json
+from fastapi import APIRouter, Depends
 
-from fastapi import APIRouter, HTTPException
+from api.dependencies import verify_api_key
+from api.schemas.churn import ChurnResponse
+from api.services.customer_service import get_customer_record
+from api.services.prediction_service import build_churn_result
 
-from api.data_store import store
-from api.schemas import ChurnResponse, SHAPFeature
-
-router = APIRouter(prefix="/churn", tags=["churn"])
+router = APIRouter(prefix="/churn", tags=["churn"], dependencies=[Depends(verify_api_key)])
 
 
-# Return churn probability and the top SHAP features for a customer.
+# Business logic lives in services/ -- this handler only receives the
+# request, calls the service, and returns the response model. Not-found
+# is raised as CustomerNotFoundError inside get_customer_record and mapped
+# to a safe 404 by the centralized handler in exceptions.py.
 @router.get("/{customer_unique_id}", response_model=ChurnResponse)
 def get_churn(customer_unique_id: str):
-    record = store.get(customer_unique_id)
-    if record is None:
-        raise HTTPException(status_code=404, detail=f"Customer '{customer_unique_id}' not found")
-
-    # Convert stored SHAP feature JSON into validated response objects.
-    top_features = [SHAPFeature(**f) for f in json.loads(record["churn_shap_top_features"])]
-
-    return ChurnResponse(
-        customer_unique_id=customer_unique_id,
-        churn_probability=record["churn_probability"],
-        segment_id=int(record["segment_id"]),
-        top_features=top_features,
-    )
+    record = get_customer_record(customer_unique_id)
+    result = build_churn_result(record)
+    return ChurnResponse(customer_unique_id=customer_unique_id, **result)
