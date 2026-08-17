@@ -10,7 +10,7 @@ from api.config import get_settings
 from api.data_store import store
 from api.exceptions import register_exception_handlers
 from api.middleware import RequestLoggingMiddleware
-from api.routers import churn, clv, customers, forecast, health, insights, segments
+from api.routers import churn, clv, customers, forecast, health, insights, narrative, segments
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
 logger = logging.getLogger("api")
@@ -52,4 +52,5 @@ app.include_router(segments.router, prefix="/api/v1")
 app.include_router(churn.router, prefix="/api/v1")
 app.include_router(clv.router, prefix="/api/v1")
 app.include_router(insights.router, prefix="/api/v1")
+app.include_router(narrative.router, prefix="/api/v1")
 app.include_router(forecast.router, prefix="/api/v1")

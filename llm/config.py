@@ -15,8 +15,8 @@ load_dotenv(PROJECT_ROOT / ".env")
 # and can't be reconfigured afterward (e.g. in tests via monkeypatch).
 class LLMSettings:
     def __init__(self):
-        self.api_key: str = os.getenv("ANTHROPIC_API_KEY", "")
-        self.model: str = os.getenv("LLM_MODEL", "claude-sonnet-5")
+        self.api_key: str = os.getenv("GEMINI_API_KEY", "")
+        self.model: str = os.getenv("LLM_MODEL", "gemini-3.6-flash")
         self.timeout_seconds: float = float(os.getenv("LLM_TIMEOUT_SECONDS", "20"))
         self.max_retries: int = int(os.getenv("LLM_MAX_RETRIES", "2"))
 
