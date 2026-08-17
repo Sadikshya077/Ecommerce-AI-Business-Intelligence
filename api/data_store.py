@@ -31,7 +31,7 @@ def load_segment_profile() -> list:
     profile["segment_label"] = profile["segment_id"].map(SEGMENT_LABELS)
     return profile.to_dict(orient="records")
 
-# Fixed mapping from k=4 segmentation result
+# Fixed mapping from Phase 3's k=4 segmentation result -- see reports/methodology_phase3.md
 SEGMENT_LABELS = {
     0: "Lapsed one-time buyers",
     1: "Recent one-time buyers",
@@ -100,6 +100,13 @@ class CustomerStore:
         if self._df is None:
             raise RuntimeError("CustomerStore.load() must be called before use")
         return self._df.sample(min(n, len(self._df))).reset_index()
+
+    # Full customer table -- used by offline scripts (e.g. the LLM
+    # evaluation sampler) that need the whole population, not a random cut
+    def all_customers(self) -> pd.DataFrame:
+        if self._df is None:
+            raise RuntimeError("CustomerStore.load() must be called before use")
+        return self._df.reset_index()
 
     def __len__(self):
         return 0 if self._df is None else len(self._df)

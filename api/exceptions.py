@@ -26,6 +26,17 @@ class PredictionServiceError(Exception):
         self.message = message
 
 
+# Raised when the LLM narration layer fails to produce a valid narrative
+# (timeout, malformed output, schema violation). Kept distinct from
+# ModelArtifactMissingError -- a live external API being unavailable is a
+# different failure class than a missing local file, worth distinguishing
+# in logs and in how a client might reasonably react (retry later vs. rerun
+# a pipeline script).
+class NarrationUnavailableError(Exception):
+    def __init__(self, message: str):
+        self.message = message
+
+
 # Each handler returns a safe, minimal client-facing message; full detail
 # goes to the server log only -- no stack traces, paths, or internals leak out
 async def customer_not_found_handler(request: Request, exc: CustomerNotFoundError):
@@ -42,6 +53,11 @@ async def prediction_service_error_handler(request: Request, exc: PredictionServ
     return JSONResponse(status_code=500, content={"detail": "Prediction service encountered an error"})
 
 
+async def narration_unavailable_handler(request: Request, exc: NarrationUnavailableError):
+    logger.error("Narration unavailable: %s", exc.message)
+    return JSONResponse(status_code=503, content={"detail": "Narrative generation is temporarily unavailable"})
+
+
 # Catch-all for anything unexpected
 async def unhandled_exception_handler(request: Request, exc: Exception):
     logger.exception("Unhandled exception on %s %s", request.method, request.url.path)
@@ -52,4 +68,5 @@ def register_exception_handlers(app):
     app.add_exception_handler(CustomerNotFoundError, customer_not_found_handler)
     app.add_exception_handler(ModelArtifactMissingError, model_artifact_missing_handler)
     app.add_exception_handler(PredictionServiceError, prediction_service_error_handler)
+    app.add_exception_handler(NarrationUnavailableError, narration_unavailable_handler)
     app.add_exception_handler(Exception, unhandled_exception_handler)
