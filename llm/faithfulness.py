@@ -17,13 +17,21 @@ def check_faithfulness(content, insight_context: dict) -> tuple:
     known_features = {f["feature"] for f in insight_context.get("churn_top_features", [])}
     known_features |= {f["feature"] for f in insight_context.get("clv_top_features", [])}
 
-    mentioned = " ".join(content.key_drivers).lower()
-    if known_features:
-        any_known = any(f.replace("_", " ") in mentioned for f in known_features)
-        if not any_known:
-            notes.append("None of the supplied SHAP feature names appear in key_drivers")
-
+    # Search the full narrative, not just key_drivers. The prompt asks the
+    # model to ground risk_explanation directly in the supplied SHAP
+    # features, while key_drivers is often a paraphrased summary (e.g.
+    # "avg_freight" becomes "average freight fees" -- good for
+    # readability, bad for literal string matching). Checking key_drivers
+    # alone produced false negatives on narratives that were, in fact,
+    # correctly grounded: the literal feature name was just present
+    # elsewhere in the same narrative instead.
     full_text = " ".join([content.summary, content.risk_explanation] + content.key_drivers).lower()
+
+    if known_features:
+        any_known = any(f.replace("_", " ") in full_text for f in known_features)
+        if not any_known:
+            notes.append("None of the supplied SHAP feature names appear anywhere in the narrative")
+
     for phrase in CAUSAL_PHRASES:
         if phrase in full_text:
             notes.append(f"Possible causal language detected: '{phrase}'")
