@@ -108,6 +108,15 @@ class CustomerStore:
             raise RuntimeError("CustomerStore.load() must be called before use")
         return self._df.reset_index()
 
+    # Top N customers by a given column, platform-wide -- distinct from
+    # sample(), which is random. Used for leaderboard-style views where
+    # showing an actual ranked result (not a sorted random cut) matters.
+    def top_by(self, column: str, n: int, ascending: bool = False) -> pd.DataFrame:
+        if self._df is None:
+            raise RuntimeError("CustomerStore.load() must be called before use")
+        sorted_df = self._df.sort_values(column, ascending=ascending)
+        return sorted_df.head(n).reset_index()
+
     def __len__(self):
         return 0 if self._df is None else len(self._df)
 
