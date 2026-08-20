@@ -20,6 +20,18 @@ def sample_customers(n: int) -> list:
     return df[["customer_unique_id", "segment_label", "churn_probability", "clv_ml"]].to_dict(orient="records")
 
 
+# Actual highest-risk customers platform-wide, not a sorted random sample
+def get_churn_risk_leaderboard(n: int) -> list:
+    df = store.top_by("churn_probability", n, ascending=False)
+    return df[["customer_unique_id", "segment_label", "churn_probability", "clv_ml"]].to_dict(orient="records")
+
+
+# Actual highest-value customers platform-wide, not a sorted random sample
+def get_clv_leaderboard(n: int) -> list:
+    df = store.top_by("clv_ml", n, ascending=False)
+    return df[["customer_unique_id", "segment_label", "churn_probability", "clv_ml"]].to_dict(orient="records")
+
+
 def get_segment_profiles() -> list:
     if not store.segment_profile:
         raise ModelArtifactMissingError("segment_profile.parquet not loaded")

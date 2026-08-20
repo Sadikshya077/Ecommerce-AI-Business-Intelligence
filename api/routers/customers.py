@@ -6,16 +6,35 @@ from fastapi import APIRouter, Depends
 
 from api.dependencies import verify_api_key
 from api.schemas.customer import CustomerProfile, CustomerSample
-from api.services.customer_service import get_customer_record, sample_customers
+from api.services.customer_service import (
+    get_churn_risk_leaderboard,
+    get_clv_leaderboard,
+    get_customer_record,
+    sample_customers,
+)
 
 router = APIRouter(prefix="/customers", tags=["customers"], dependencies=[Depends(verify_api_key)])
 
 
-# Registered before the {customer_unique_id} route below so "sample" is
-# never matched as a path parameter value
+# All registered before the {customer_unique_id} route below so these
+# literal paths are never matched as a path parameter value
 @router.get("/sample", response_model=List[CustomerSample])
 def get_sample_customers(n: int = 5):
     return sample_customers(n)
+
+
+# Actual top-N customers by churn risk platform-wide -- distinct from
+# /sample, which is random. See api/data_store.py's top_by() for why this
+# needed a small backend addition rather than being sorted client-side.
+@router.get("/top-churn-risk", response_model=List[CustomerSample])
+def get_top_churn_risk(n: int = 20):
+    return get_churn_risk_leaderboard(n)
+
+
+# Actual top-N customers by predicted CLV platform-wide
+@router.get("/top-clv", response_model=List[CustomerSample])
+def get_top_clv(n: int = 20):
+    return get_clv_leaderboard(n)
 
 
 # Lightweight customer profile -- segment, churn, both CLV estimates,

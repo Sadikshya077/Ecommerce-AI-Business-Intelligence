@@ -1,9 +1,10 @@
-"""dashboard/pages/1_Segment_Explorer.py"""
+"""dashboard/pages/Segment_Explorer.py"""
 
 import pandas as pd
 import streamlit as st
 
 from api_client import APIClientError, get_segments
+from chart_utils import wrapped_bar_chart
 
 st.set_page_config(page_title="Segment Explorer", layout="wide")
 st.title("Segment Explorer")
@@ -16,15 +17,15 @@ except APIClientError as exc:
 
 df = pd.DataFrame(segments)
 
-st.bar_chart(df.set_index("segment_label")["n_customers"])
+wrapped_bar_chart(df, "segment_label", "n_customers", y_axis_title="Customers")
 st.caption("Customers per segment")
 
 col1, col2 = st.columns(2)
 with col1:
-    st.bar_chart(df.set_index("segment_label")["avg_monetary"])
+    wrapped_bar_chart(df, "segment_label", "avg_monetary", y_axis_title="Avg. spend (R$)")
     st.caption("Average historical spend per segment (R$)")
 with col2:
-    st.bar_chart(df.set_index("segment_label")["avg_recency_days"])
+    wrapped_bar_chart(df, "segment_label", "avg_recency_days", y_axis_title="Avg. recency (days)")
     st.caption("Average recency per segment (days)")
 
 st.divider()
