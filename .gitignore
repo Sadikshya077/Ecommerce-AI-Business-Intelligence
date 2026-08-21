@@ -1,9 +1,11 @@
 # Virtual environment
 .venv/
+venv/
 
 # Python
 __pycache__/
 *.py[cod]
+.pytest_cache/
 
 # Jupyter
 .ipynb_checkpoints/
@@ -17,6 +19,14 @@ data/processed/
 
 # MLflow
 mlruns/
+mlflow/
+
+# Model artifacts (large binaries -- track via MLflow, not git)
+*.pkl
+*.joblib
+*.h5
+*.pt
+*.onnx
 
 # VS Code
 .vscode/

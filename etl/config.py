@@ -1,11 +1,9 @@
 """
-etl/config.py
-==============
 Central configuration for the Olist ETL pipeline: paths, expected raw
 filenames, date columns to parse, and primary-key definitions per table.
 
 Keeping this in one place means every other etl/ module imports from here
-instead of hardcoding paths or table names -- if the raw file layout or
+instead of hardcoding paths or table names. If the raw file layout or
 project directory structure changes, this is the only file that changes.
 """
 

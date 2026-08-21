@@ -1,7 +1,5 @@
 """
-etl/extract.py
-================
-Stage 1 of the pipeline: read the raw Olist CSVs from data/raw/ into a dict
+Reads the raw Olist CSVs from data/raw/ into a dict
 of DataFrames. Fails fast (ETLError) if the raw directory or any expected
 file is missing, so later stages never run against partial data.
 """

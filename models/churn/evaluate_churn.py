@@ -1,21 +1,10 @@
 """
 models/churn/evaluate_churn.py
 
-Compares the Logistic Regression and XGBoost churn models trained in
-train_churn.py, selects a winner by ROC-AUC (churn_probability feeds
-directly into the CLV formula as a continuous risk score, so ranking
-quality matters more than a single threshold's point accuracy), and
-scores the full customer population with the winning model.
+Compares Logistic Regression and XGBoost churn models, selects the
+winner by ROC-AUC, and generates churn probabilities for all customers.
 
-Output:
-    reports/figures/churn_roc_curve.png
-    reports/figures/churn_confusion_matrices.png
-    data/processed/models/churn_metrics_comparison.csv
-    data/processed/models/churn_predictions.parquet
-        customer_unique_id, segment_id, churn_probability
-        -- this is the file Phase 4b (CLV) consumes.
-
-Run from project root (after train_churn.py):
+Run from project root:
     python -m models.churn.evaluate_churn
 """
 

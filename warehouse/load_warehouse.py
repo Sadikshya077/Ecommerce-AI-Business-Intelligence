@@ -1,56 +1,17 @@
 """
 warehouse/load_warehouse.py
-
-Loads the cleaned Parquet output of the etl package into the
-PostgreSQL star schema defined in warehouse/schema.sql.
-
-This matches the actual ETL output: 8 separate cleaned tables
-(customers, orders, order_items, payments, reviews, products,
-sellers, geolocation) rather than one pre-joined wide table.
-The order-item grain fact table is built here, in this script,
-by joining them.
-
-IMPORTANT -- two things transform.py does NOT handle, which this
-script has to account for:
-
-1. payments and reviews can have more than one row per order_id
-   (payments: no natural PK, multiple installments/vouchers per
-   order; reviews: rare duplicate review submissions). Joining
-   either directly onto order_items at native grain would fan out
-   the fact table -- each is aggregated down to one row per
-   order_id first.
-
-2. validate.py only *warns* about orphaned foreign keys, it does
-   not drop the offending rows. The left joins below will leave a
-   NULL surrogate key wherever a parent record is genuinely missing
-   (e.g. an order_item pointing at a product_id absent from
-   products.parquet). NULL foreign keys are allowed by the schema
-   so the load will not fail, but this script logs how many rows
-   were affected per dimension -- check that output before treating
-   the warehouse as ground truth for churn/CLV feature engineering.
-
-ASSUMPTION -- this script uses the original Olist column names
-(product_category_name, product_weight_g, customer_zip_code_prefix,
-seller_zip_code_prefix, etc.), since your transform.py's cleaning
-functions don't appear to rename columns, only cast/fill them. If
-any of your _clean_* functions do rename columns, adjust the
-`.rename()` calls below to match.
-
-Prerequisites:
-    1. PostgreSQL running, reachable via .env
-    2. Schema applied: psql -U postgres -d ecommerce_bi -f warehouse\\schema.sql
-    3. ETL already run: python -m etl.pipeline
-
-Run from project root:
-    python warehouse\\load_warehouse.py
 """
+
+
+# Loads the cleaned Parquet output of the etl package into the
+# PostgreSQL star schema defined in warehouse/schema.sql.
 
 import logging
 from pathlib import Path
 
 import pandas as pd
 
-from db import get_engine
+from warehouse.db import get_engine
 
 PROCESSED_DIR = Path(__file__).resolve().parent.parent / "data" / "processed"
 
@@ -267,3 +228,5 @@ def run():
 
 if __name__ == "__main__":
     run()
+
+

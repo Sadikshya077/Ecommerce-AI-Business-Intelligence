@@ -1,7 +1,5 @@
 """
-etl/validate.py
-=================
-Stage 2 of the pipeline: sanity-check the raw tables before transforming.
+Sanity-check the raw tables before transforming.
 Does NOT mutate data -- only inspects it and records warnings on the
 RunReport. Only hard-fails (ETLError) on problems that would make
 transformation meaningless, e.g. a required key column missing entirely.

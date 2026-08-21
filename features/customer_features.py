@@ -1,21 +1,6 @@
-"""
-features/customer_features.py
-
-Builds customer-level features (RFM, satisfaction, category diversity)
-from the PostgreSQL warehouse.
-
-IMPORTANT: Olist's customer_id is generated fresh per order -- it does
-NOT identify a returning customer. customer_unique_id is the actual
-person. All aggregation here groups by customer_unique_id, never by
-customer_id, or every repeat customer will look like a first-time
-buyer in every feature.
-
-Output: data/processed/features/customer_features.parquet
-One row per customer_unique_id.
-
-Run from project root:
-    python -m features.customer_features
-"""
+# Build customer-level RFM and behavioral features from the warehouse
+# Groups customers by customer_unique_id to correctly identify repeat buyers
+# Output: data/processed/features/customer_features.parquet
 
 import logging
 from pathlib import Path

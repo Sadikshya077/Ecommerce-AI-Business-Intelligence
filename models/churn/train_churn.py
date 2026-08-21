@@ -2,31 +2,8 @@
 models/churn/train_churn.py
 
 Trains Logistic Regression and XGBoost churn classifiers and logs
-both to MLflow for comparison. Model selection and full-population
-scoring happen in evaluate_churn.py -- this script's job is strictly
-training and honest, side-by-side logging of both candidates.
-
-Churn label: a customer is labeled churned if recency_days exceeds
-the data-driven churn window computed in churn_window.py. recency_days
-is used ONLY to build the label and is then dropped from the feature
-set -- including it as a feature would make the "prediction" a
-tautology, since the label is directly derived from it. The model
-instead predicts churn risk from behavioral and satisfaction signals:
-purchase frequency, spend, delivery experience, review scores,
-category diversity, segment membership, and tenure.
-
-Output:
-    data/processed/models/churn_test_predictions.parquet
-        customer_unique_id, y_true, logreg_proba, xgb_proba
-    models/churn/artifacts/logreg_model.joblib
-    models/churn/artifacts/xgb_model.joblib
-    models/churn/artifacts/scaler.joblib
-    models/churn/artifacts/feature_columns.joblib
-    models/churn/artifacts/churn_window_days.txt
-    MLflow runs under experiment "churn_prediction"
-
-Run from project root:
-    python -m models.churn.train_churn
+both to MLflow. Model selection and full-population scoring are handled
+by evaluate_churn.py.
 """
 
 import logging

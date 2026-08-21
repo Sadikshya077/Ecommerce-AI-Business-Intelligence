@@ -1,6 +1,4 @@
 """
-etl/report.py
-==============
 RunReport: a small mutable container passed through extract -> validate ->
 transform so each stage can record row counts and warnings, then pipeline.py
 prints a single summary at the end of the run.

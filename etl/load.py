@@ -1,8 +1,5 @@
-"""
-etl/load.py
-============
-Stage 4 of the pipeline: write cleaned tables to data/processed/*.parquet.
-Idempotent -- reruns overwrite the previous output rather than appending.
+"""Writes cleaned tables to data/processed/*.parquet.
+Idempotent - reruns overwrite the previous output rather than appending.
 
 Note: this does NOT load into PostgreSQL. That's warehouse/load_warehouse.py's
 job, which reads these same parquet files as its input.
