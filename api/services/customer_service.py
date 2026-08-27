@@ -36,3 +36,7 @@ def get_segment_profiles() -> list:
     if not store.segment_profile:
         raise ModelArtifactMissingError("segment_profile.parquet not loaded")
     return store.segment_profile
+
+
+def get_kpi_summary() -> dict:
+    return store.aggregate_kpis()
