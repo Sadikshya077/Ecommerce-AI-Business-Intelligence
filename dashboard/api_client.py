@@ -31,53 +31,22 @@ class APIClientError(Exception):
         super().__init__(message)
 
 
-def _get(path: str, params: dict | None = None):
+def _get(path: str, params: dict = None):
     url = f"{API_BASE_URL}{path}"
-
     try:
-        response = requests.get(
-            url,
-            headers=HEADERS,
-            params=params,
-            timeout=TIMEOUT_SECONDS,
-        )
-    except requests.exceptions.Timeout as exc:
-        logger.error("Request to %s timed out", url)
-        raise APIClientError(
-            "The API request timed out. Please try again."
-        ) from exc
+        response = requests.get(url, headers=HEADERS, params=params, timeout=TIMEOUT_SECONDS)
     except requests.exceptions.RequestException as exc:
         logger.error("Request to %s failed: %s", url, exc)
-        raise APIClientError(
-            f"Could not reach the API at {API_BASE_URL}. Is it running?"
-        ) from exc
-
-    if response.status_code == 401:
-        raise APIClientError("API key rejected -- check API_KEY in .env")
+        raise APIClientError(f"Could not reach the API at {API_BASE_URL}. Is it running?") from exc
 
     if response.status_code == 404:
-        raise APIClientError("Requested resource was not found")
-
+        raise APIClientError("Not found")
+    if response.status_code == 401:
+        raise APIClientError("API key rejected -- check API_KEY in .env")
     if response.status_code == 503:
         raise APIClientError("This data is temporarily unavailable")
-
     if not response.ok:
-        logger.error(
-            "API request failed: %s returned HTTP %s",
-            url,
-            response.status_code,
-        )
-        raise APIClientError(
-            f"Unexpected API response ({response.status_code})"
-        )
-
-    try:
-        return response.json()
-    except ValueError as exc:
-        logger.error("API returned invalid JSON from %s", url)
-        raise APIClientError(
-            "The API returned an invalid response."
-        ) from exc
+        raise APIClientError(f"Unexpected API response ({response.status_code})")
 
     return response.json()
 
@@ -96,6 +65,10 @@ def get_churn_risk_leaderboard(n: int = 20) -> list:
 
 def get_clv_leaderboard(n: int = 20) -> list:
     return _get("/api/v1/customers/top-clv", params={"n": n})
+
+
+def get_customer_kpis() -> dict:
+    return _get("/api/v1/customers/kpis")
 
 
 def get_customer_profile(customer_id: str) -> dict:

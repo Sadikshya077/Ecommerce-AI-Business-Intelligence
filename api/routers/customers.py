@@ -5,11 +5,12 @@ from typing import List
 from fastapi import APIRouter, Depends
 
 from api.dependencies import verify_api_key
-from api.schemas.customer import CustomerProfile, CustomerSample
+from api.schemas.customer import CustomerProfile, CustomerSample, KPISummary
 from api.services.customer_service import (
     get_churn_risk_leaderboard,
     get_clv_leaderboard,
     get_customer_record,
+    get_kpi_summary,
     sample_customers,
 )
 
@@ -35,6 +36,12 @@ def get_top_churn_risk(n: int = 20):
 @router.get("/top-clv", response_model=List[CustomerSample])
 def get_top_clv(n: int = 20):
     return get_clv_leaderboard(n)
+
+
+# Population-level KPI aggregates for the dashboard Overview page
+@router.get("/kpis", response_model=KPISummary)
+def get_customer_kpis():
+    return get_kpi_summary()
 
 
 # Lightweight customer profile -- segment, churn, both CLV estimates,

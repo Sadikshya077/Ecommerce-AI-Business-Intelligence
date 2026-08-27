@@ -32,3 +32,14 @@ class SegmentProfile(BaseModel):
     avg_frequency: float
     avg_monetary: float
     pct_of_customers: float
+
+
+# Response for GET /customers/kpis -- population-level aggregates for the
+# dashboard Overview page
+class KPISummary(BaseModel):
+    total_customers: int
+    avg_churn_probability: float
+    high_risk_count: int
+    avg_clv_ml: float
+    avg_historical_spend: float
+    total_historical_spend: float

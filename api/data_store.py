@@ -117,6 +117,24 @@ class CustomerStore:
         sorted_df = self._df.sort_values(column, ascending=ascending)
         return sorted_df.head(n).reset_index()
 
+    # Population-level KPI aggregates, computed once per call from the
+    # in-memory table. No prior endpoint exposes these -- segment_profile
+    # predates churn/CLV and never carried those columns -- so this fills
+    # a genuine gap rather than forcing the dashboard to approximate
+    # platform-wide stats from a sample.
+    def aggregate_kpis(self) -> dict:
+        if self._df is None:
+            raise RuntimeError("CustomerStore.load() must be called before use")
+        df = self._df
+        return {
+            "total_customers": int(len(df)),
+            "avg_churn_probability": float(df["churn_probability"].mean()),
+            "high_risk_count": int((df["churn_probability"] > 0.6).sum()),
+            "avg_clv_ml": float(df["clv_ml"].mean()),
+            "avg_historical_spend": float(df["monetary"].mean()),
+            "total_historical_spend": float(df["monetary"].sum()),
+        }
+
     def __len__(self):
         return 0 if self._df is None else len(self._df)
 
