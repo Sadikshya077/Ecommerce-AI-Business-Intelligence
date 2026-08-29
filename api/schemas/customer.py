@@ -41,5 +41,8 @@ class KPISummary(BaseModel):
     avg_churn_probability: float
     high_risk_count: int
     avg_clv_ml: float
+    total_clv_ml: float
+    clv_p75_threshold: float
+    high_value_count: int
     avg_historical_spend: float
     total_historical_spend: float

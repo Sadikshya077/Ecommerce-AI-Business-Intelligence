@@ -126,11 +126,15 @@ class CustomerStore:
         if self._df is None:
             raise RuntimeError("CustomerStore.load() must be called before use")
         df = self._df
+        clv_p75 = float(df["clv_ml"].quantile(0.75))
         return {
             "total_customers": int(len(df)),
             "avg_churn_probability": float(df["churn_probability"].mean()),
             "high_risk_count": int((df["churn_probability"] > 0.6).sum()),
             "avg_clv_ml": float(df["clv_ml"].mean()),
+            "total_clv_ml": float(df["clv_ml"].sum()),
+            "clv_p75_threshold": clv_p75,
+            "high_value_count": int((df["clv_ml"] > clv_p75).sum()),
             "avg_historical_spend": float(df["monetary"].mean()),
             "total_historical_spend": float(df["monetary"].sum()),
         }
