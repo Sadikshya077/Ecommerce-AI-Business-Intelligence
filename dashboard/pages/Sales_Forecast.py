@@ -4,21 +4,31 @@ import pandas as pd
 import streamlit as st
 
 from api_client import APIClientError, get_forecast_series, get_forecast_summary
+from chart_utils import forecast_chart
+from formatting import format_currency
 
-st.set_page_config(page_title="Sales Forecast", layout="wide")
+st.set_page_config(page_title="Sales Forecast", layout="wide", page_icon="\U0001F4C8")
 st.title("Sales Forecast")
+st.caption(
+    "The forecast estimates future revenue based on historical sales patterns. "
+    "The shaded region represents forecast uncertainty, not a guaranteed outcome."
+)
 
 try:
     summary = get_forecast_summary()
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Prior 30d actual revenue", f"R$ {summary['prior_30d_actual_revenue']:,.2f}")
-    col2.metric("Next 30d predicted revenue", f"R$ {summary['next_30d_predicted_revenue']:,.2f}")
-    col3.metric("Change", f"{summary['pct_change']:+.1f}%")
-    st.caption(f"Trend: {summary['trend_direction']} -- last actual data point: {summary['last_actual_date']}")
 except APIClientError as exc:
-    st.warning(f"Forecast summary unavailable: {exc.message}")
+    st.error(f"Could not load forecast summary: {exc.message}")
+    st.stop()
+
+col1, col2, col3, col4 = st.columns(4)
+col1.metric("Prior 30-day revenue", format_currency(summary["prior_30d_actual_revenue"]))
+col2.metric("Next 30-day predicted revenue", format_currency(summary["next_30d_predicted_revenue"]))
+col3.metric("Expected change", f"{summary['pct_change']:+.1f}%")
+col4.metric("Trend", summary["trend_direction"].capitalize())
 
 st.divider()
+
+st.subheader("Predicted daily revenue")
 
 try:
     series = get_forecast_series()
@@ -32,8 +42,30 @@ if not series:
 
 df = pd.DataFrame(series)
 df["ds"] = pd.to_datetime(df["ds"])
-df = df.set_index("ds")
+forecast_chart(
+    df, date_col="ds", predicted_col="yhat", lower_col="yhat_lower", upper_col="yhat_upper",
+    title="Daily revenue forecast with uncertainty band",
+)
 
-st.subheader("Predicted daily revenue")
-st.line_chart(df[["yhat_lower", "yhat", "yhat_upper"]])
-st.caption("yhat = predicted revenue, with lower/upper confidence bounds")
+st.divider()
+
+st.subheader("What this means")
+trend = summary["trend_direction"]
+pct = summary["pct_change"]
+
+if trend == "up":
+    implication = (
+        f"Revenue is trending **up** ({pct:+.1f}%), suggesting current demand and retention efforts "
+        f"are translating into growth. Worth ensuring inventory and fulfillment capacity can support it."
+    )
+elif trend == "down":
+    implication = (
+        f"Revenue is trending **down** ({pct:+.1f}%) -- worth checking whether this aligns with seasonal "
+        f"patterns or reflects a genuine decline, alongside the Churn Risk page."
+    )
+else:
+    implication = (
+        f"Revenue is expected to stay relatively **flat** ({pct:+.1f}%) over the next 30 days -- "
+        f"no major shift in either direction is currently predicted."
+    )
+st.markdown(implication)

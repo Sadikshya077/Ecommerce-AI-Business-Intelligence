@@ -1,10 +1,10 @@
 """tests/test_dashboard_formatting.py"""
 
-from dashboard.formatting import currency, human_feature_name, percent, risk_category
+from dashboard.formatting import format_currency, human_feature_name, percent, risk_category
 
 
 def test_currency_formats_with_two_decimals_and_thousands_separator():
-    assert currency(1234.5) == "R$ 1,234.50"
+    assert format_currency(1234.5) == "R$ 1,234.50"
 
 
 def test_percent_formats_fraction_as_percentage():

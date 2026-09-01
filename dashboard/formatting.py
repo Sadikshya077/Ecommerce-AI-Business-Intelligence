@@ -4,7 +4,7 @@
 # should ever show a raw float like 0.5272793769836426 to a user.
 
 
-def currency(value) -> str:
+def format_currency(value) -> str:
     return f"R$ {value:,.2f}"
 
 
