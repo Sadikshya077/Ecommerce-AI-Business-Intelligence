@@ -5,7 +5,7 @@ import streamlit as st
 
 from api_client import APIClientError, get_churn_risk_leaderboard, get_customer_kpis
 from chart_utils import horizontal_bar_chart
-from formatting import RISK_THRESHOLDS, currency, percent, risk_badge, risk_category
+from formatting import RISK_THRESHOLDS, format_currency, percent, risk_badge, risk_category
 
 st.set_page_config(page_title="Churn Risk", layout="wide", page_icon="\u26A0\ufe0f")
 st.title("Churn Risk")
@@ -36,7 +36,7 @@ col1.metric("High-risk customers (platform-wide)", f"{kpis['high_risk_count']:,}
 col2.metric("Avg. churn probability (platform-wide)", percent(kpis["avg_churn_probability"]))
 col3.metric("Highest churn probability", percent(df["churn_probability"].max()))
 high_risk_value = df.loc[df["risk_category"] == "High", "clv_ml"].sum()
-col4.metric("Value of high-risk customers shown", currency(high_risk_value))
+col4.metric("Value of high-risk customers shown", format_currency(high_risk_value))
 
 st.caption(
     f"Risk tiers (dashboard convention, not a model output): "
@@ -60,7 +60,7 @@ st.divider()
 st.subheader("Highest churn risk customers")
 display_df = df.copy()
 display_df["Churn risk"] = display_df["churn_probability"].apply(percent)
-display_df["Predicted CLV"] = display_df["clv_ml"].apply(currency)
+display_df["Predicted CLV"] = display_df["clv_ml"].apply(format_currency)
 display_df["Risk"] = display_df["churn_probability"].apply(risk_badge)
 
 st.dataframe(
@@ -93,7 +93,7 @@ else:
             c1.write(f"**{row['customer_unique_id']}**")
             c2.write(row["segment_label"])
             c3.write(f"Risk: {percent(row['churn_probability'])}")
-            c4.write(f"CLV: {currency(row['clv_ml'])}")
+            c4.write(f"CLV: {format_currency(row['clv_ml'])}")
             # Wired for Customer 360 -- functional once that page is added
             if st.button("View Customer 360 \u2192", key=f"churn_view_{row['customer_unique_id']}"):
                 st.session_state["selected_customer_id"] = row["customer_unique_id"]

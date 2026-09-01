@@ -11,7 +11,7 @@ from api_client import (
     get_segments,
 )
 from chart_utils import horizontal_bar_chart, risk_value_scatter
-from formatting import currency, percent, risk_category
+from formatting import format_currency, percent, risk_category
 
 st.set_page_config(page_title="Ecommerce BI Dashboard", layout="wide", page_icon="\U0001F4CA")
 
@@ -27,7 +27,7 @@ except APIClientError as exc:
 
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Total customers", f"{kpis['total_customers']:,}")
-col2.metric("Avg. predicted CLV", currency(kpis["avg_clv_ml"]))
+col2.metric("Avg. predicted CLV", format_currency(kpis["avg_clv_ml"]))
 col3.metric("Avg. churn probability", percent(kpis["avg_churn_probability"]))
 col4.metric("High-risk customers", f"{kpis['high_risk_count']:,}")
 
@@ -42,8 +42,8 @@ risk_note = (
     f"is currently classified as high churn risk (predicted churn probability above 60%)."
 )
 value_note = (
-    f"The average predicted lifetime value per customer is **{currency(kpis['avg_clv_ml'])}**, "
-    f"against an average historical spend of **{currency(kpis['avg_historical_spend'])}** -- "
+    f"The average predicted lifetime value per customer is **{format_currency(kpis['avg_clv_ml'])}**, "
+    f"against an average historical spend of **{format_currency(kpis['avg_historical_spend'])}** -- "
     f"reflecting a customer base where most customers have purchased only once so far."
 )
 
@@ -52,7 +52,7 @@ try:
     trend_note = (
         f"Revenue is forecast to trend **{forecast['trend_direction']}** over the next 30 days "
         f"({forecast['pct_change']:+.1f}% vs. the prior 30 days), predicting "
-        f"**{currency(forecast['next_30d_predicted_revenue'])}**."
+        f"**{format_currency(forecast['next_30d_predicted_revenue'])}**."
     )
 except APIClientError:
     trend_note = "Sales forecast is currently unavailable."

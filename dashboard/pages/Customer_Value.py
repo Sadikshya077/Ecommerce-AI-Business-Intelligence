@@ -5,7 +5,7 @@ import streamlit as st
 
 from api_client import APIClientError, get_clv_leaderboard, get_customer_kpis, get_segments
 from chart_utils import horizontal_bar_chart, risk_value_scatter
-from formatting import currency, risk_badge
+from formatting import format_currency, risk_badge
 
 st.set_page_config(page_title="Customer Value", layout="wide", page_icon="\U0001F4B0")
 st.title("Customer Value")
@@ -31,12 +31,12 @@ df = pd.DataFrame(leaderboard)
 
 # --- KPI cards ----------------------------------------------------------
 col1, col2, col3, col4 = st.columns(4)
-col1.metric("Avg. predicted CLV (platform-wide)", currency(kpis["avg_clv_ml"]))
-col2.metric("Highest predicted CLV", currency(df["clv_ml"].max()))
-col3.metric("Total predicted CLV (platform-wide)", currency(kpis["total_clv_ml"]))
+col1.metric("Avg. predicted CLV (platform-wide)", format_currency(kpis["avg_clv_ml"]))
+col2.metric("Highest predicted CLV", format_currency(df["clv_ml"].max()))
+col3.metric("Total predicted CLV (platform-wide)", format_currency(kpis["total_clv_ml"]))
 col4.metric("High-value customers (top 25%)", f"{kpis['high_value_count']:,}")
 st.caption(
-    f'"High value" here means predicted CLV above {currency(kpis["clv_p75_threshold"])} '
+    f'"High value" here means predicted CLV above {format_currency(kpis["clv_p75_threshold"])} '
     f"(the platform's 75th percentile) -- a dashboard convention, not a model output."
 )
 
@@ -45,7 +45,7 @@ st.divider()
 # --- Leaderboard ----------------------------------------------------------
 st.subheader("Highest predicted value customers")
 display_df = df.copy()
-display_df["Predicted CLV"] = display_df["clv_ml"].apply(currency)
+display_df["Predicted CLV"] = display_df["clv_ml"].apply(format_currency)
 display_df["Churn risk"] = display_df["churn_probability"].apply(risk_badge)
 st.dataframe(
     display_df.rename(columns={"customer_unique_id": "Customer ID", "segment_label": "Segment"})[
