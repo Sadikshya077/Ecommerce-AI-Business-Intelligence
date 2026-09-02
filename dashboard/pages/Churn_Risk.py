@@ -97,7 +97,7 @@ else:
             # Wired for Customer 360 -- functional once that page is added
             if st.button("View Customer 360 \u2192", key=f"churn_view_{row['customer_unique_id']}"):
                 st.session_state["selected_customer_id"] = row["customer_unique_id"]
-                st.switch_page("pages/5_Customer_360.py")
+                st.switch_page("pages/Customer_360.py")
 
 st.divider()
 
