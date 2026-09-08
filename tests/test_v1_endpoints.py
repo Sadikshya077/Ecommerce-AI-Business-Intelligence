@@ -58,6 +58,26 @@ def test_insights_bundles_everything_in_one_call(client):
     assert "clv_top_features" in body
     assert body["market_context"]["trend_direction"] == "up"
     assert "association_rules_note" in body
+    # Behavioral profile fields, reused from customer_features.parquet
+    assert body["frequency"] == 2.0
+    assert body["recency_days"] == 150.0
+    assert body["avg_order_value"] == 140.0
+    assert body["avg_freight"] == 18.5
+    assert body["avg_delivery_days"] == 9.0
+    assert body["avg_review_score"] == 4.2
+
+
+def test_insights_returns_null_not_nan_for_missing_optional_fields(client):
+    # cust_high_risk has no delivery-time or review data on record -- these
+    # must serialize as JSON null, not a literal NaN float
+    response = client.get("/api/v1/customers/cust_high_risk/insights")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["avg_delivery_days"] is None
+    assert body["avg_review_score"] is None
+    # Required behavioral fields are still present and correct
+    assert body["frequency"] == 1.0
+    assert body["recency_days"] == 410.0
 
 
 def test_insights_unknown_customer_returns_404(client):

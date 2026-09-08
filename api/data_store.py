@@ -61,10 +61,18 @@ class CustomerStore:
             lines = "\n".join(f"  {f} -- run: {cmd}" for f, cmd in missing.items())
             raise RuntimeError(f"Cannot start API: required model outputs are missing.\n{lines}")
 
+        features_path = PROJECT_ROOT / "data" / "processed" / "features" / "customer_features.parquet"
+        if not features_path.exists():
+            raise RuntimeError(
+                "Cannot start API: required feature output is missing.\n"
+                f"  {features_path.name} -- run: python -m features.customer_features"
+            )
+
         churn = pd.read_parquet(DATA_DIR / "churn_predictions.parquet")
         clv = pd.read_parquet(DATA_DIR / "clv_predictions.parquet")
         churn_shap = pd.read_parquet(DATA_DIR / "churn_shap.parquet")
         clv_shap = pd.read_parquet(DATA_DIR / "clv_shap.parquet")
+        features = pd.read_parquet(features_path)
 
         df = churn.merge(
             clv[["customer_unique_id", "clv_ml", "clv_formula", "monetary"]],
@@ -79,6 +87,17 @@ class CustomerStore:
             clv_shap[["customer_unique_id", "shap_top_features"]]
             .rename(columns={"shap_top_features": "clv_shap_top_features"}),
             on="customer_unique_id", how="left",
+        )
+        # Behavioral profile fields, reused as-is from Phase 2's feature
+        # engineering output -- not recalculated here. avg_review_score can
+        # be NaN for customers with no review (a legitimate, pre-existing
+        # gap in the source data, not introduced by this merge).
+        df = df.merge(
+            features[[
+                "customer_unique_id", "frequency", "recency_days",
+                "avg_order_value", "avg_freight", "avg_delivery_days", "avg_review_score",
+            ]],
+            on="customer_unique_id", how="left", suffixes=("", "_profile"),
         )
 
         df["segment_label"] = df["segment_id"].map(SEGMENT_LABELS)
