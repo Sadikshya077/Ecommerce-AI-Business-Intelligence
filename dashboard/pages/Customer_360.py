@@ -83,13 +83,24 @@ h4.metric("Churn probability", percent(insights["churn_probability"]))
 # --- Customer profile --------------------------------------------------
 st.divider()
 st.subheader("Customer profile")
-st.metric("Historical spend", format_currency(insights["historical_spend"]))
-st.caption(
-    "Note: purchase frequency, average order value, average freight, average delivery time, "
-    "and review score are not currently exposed by the API for an individual customer -- "
-    "only historical spend is. These exist in the underlying feature data but haven't been "
-    "wired into an endpoint yet; noting this rather than fabricating the values."
+
+p1, p2, p3 = st.columns(3)
+p1.metric("Historical spend", format_currency(insights["historical_spend"]))
+p2.metric("Purchase frequency", f"{insights['frequency']:.1f} orders")
+p3.metric("Recency", f"{insights['recency_days']:.0f} days since last purchase")
+
+p4, p5, p6 = st.columns(3)
+p4.metric("Avg. order value", format_currency(insights["avg_order_value"]))
+p5.metric("Avg. freight cost", format_currency(insights["avg_freight"]))
+p6.metric(
+    "Avg. delivery time",
+    f"{insights['avg_delivery_days']:.0f} days" if insights["avg_delivery_days"] is not None else "Not available",
 )
+
+if insights["avg_review_score"] is not None:
+    st.metric("Avg. review score", f"{insights['avg_review_score']:.1f} / 5")
+else:
+    st.caption("No review score on record for this customer.")
 
 # --- Churn analysis ----------------------------------------------------
 st.divider()

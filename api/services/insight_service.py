@@ -1,5 +1,7 @@
 """api/services/insight_service.py"""
 
+import math
+
 from api.data_store import store
 from api.schemas.insights import MarketContext
 from api.services.customer_service import get_customer_record
@@ -12,6 +14,17 @@ ASSOCIATION_RULES_NOTE = (
     "dataset (only 0.7% of orders spanned multiple categories); this signal is "
     "not available for narration."
 )
+
+
+# pandas-derived dicts return literal NaN (a float), not None, for missing
+# values -- convert explicitly so Optional fields serialize as proper JSON
+# null instead of a non-standard NaN literal.
+def _none_if_nan(value):
+    if value is None:
+        return None
+    if isinstance(value, float) and math.isnan(value):
+        return None
+    return value
 
 
 # The integrated framework artifact. Combines customer-level behavioral
@@ -36,6 +49,14 @@ def build_customer_insights(customer_unique_id: str) -> dict:
         "clv_ml": clv["clv_ml"],
         "clv_formula": clv["clv_formula"],
         "historical_spend": clv["historical_spend"],
+        # Reused as-is from the store's merged customer_features.parquet
+        # data -- not recalculated here.
+        "frequency": record["frequency"],
+        "recency_days": record["recency_days"],
+        "avg_order_value": record["avg_order_value"],
+        "avg_freight": record["avg_freight"],
+        "avg_delivery_days": _none_if_nan(record.get("avg_delivery_days")),
+        "avg_review_score": _none_if_nan(record.get("avg_review_score")),
         "churn_top_features": churn["top_features"],
         "clv_top_features": clv["top_features"],
         "association_rules_note": ASSOCIATION_RULES_NOTE,
