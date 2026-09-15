@@ -1,0 +1,22 @@
+# docker/Dockerfile.api
+FROM python:3.13-slim
+
+WORKDIR /app
+
+COPY requirements.api.txt .
+RUN pip install --no-cache-dir -r requirements.api.txt
+
+# Only the source needed to serve the API -- not the offline pipeline
+# (etl/, warehouse/, features/, models/, explainability/), which runs on
+# the host or via a one-off `docker compose run`, not as part of this
+# always-on service. api/ imports from llm/ (narration_service), so both
+# are required here.
+COPY api/ ./api/
+COPY llm/ ./llm/
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1
+
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]

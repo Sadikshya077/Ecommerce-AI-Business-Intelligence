@@ -10,8 +10,10 @@ __pycache__/
 # Jupyter
 .ipynb_checkpoints/
 
-# Environment variables
+# Environment variables / secrets
 .env
+.env.*
+!.env.example
 
 # Data
 data/raw/
@@ -20,6 +22,9 @@ data/processed/
 # MLflow
 mlruns/
 mlflow/
+*.db
+*.sqlite
+*.sqlite3
 
 # Model artifacts (large binaries -- track via MLflow, not git)
 *.pkl
@@ -27,6 +32,9 @@ mlflow/
 *.h5
 *.pt
 *.onnx
+
+# Docker
+*.log
 
 # VS Code
 .vscode/

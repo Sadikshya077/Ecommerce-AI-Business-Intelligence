@@ -1,0 +1,76 @@
+# docker-compose.yml
+#
+# Reproducibility only -- brings up the four services in the architecture
+# (PostgreSQL, MLflow, FastAPI, Streamlit) with a single command. This
+# does NOT run the offline pipeline (ETL through SHAP): per the project's
+# design, that stays a deliberate, inspectable sequence of scripts run on
+# the host (see README.md "Getting started"), not baked into an
+# always-on container. Run the pipeline once against this postgres
+# service (its port is published to the host below) before or after
+# `docker compose up`.
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devpass}
+      POSTGRES_DB: ${POSTGRES_DB:-ecommerce_bi}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mlflow:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.mlflow
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlflow:/mlflow
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    environment:
+      API_KEY: ${API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      LLM_MODEL: ${LLM_MODEL:-gemini-3.6-flash}
+      LLM_TIMEOUT_SECONDS: ${LLM_TIMEOUT_SECONDS:-20}
+      LLM_MAX_RETRIES: ${LLM_MAX_RETRIES:-2}
+      CORS_ORIGINS: http://dashboard:8501,http://localhost:8501
+    ports:
+      - "8000:8000"
+    volumes:
+      # Read-only: the API only ever reads pre-generated parquet output,
+      # it never writes to data/. Populate this by running the offline
+      # pipeline (README.md) before starting this service.
+      - ./data:/app/data:ro
+    # No depends_on for postgres/mlflow here: the API never queries either
+    # live (see api/data_store.py -- it reads only from the data/ volume
+    # above). Both remain in this compose file because they're needed to
+    # PRODUCE that data via the offline pipeline, not because the API
+    # talks to them at request time. Documenting this here so the absence
+    # of depends_on doesn't look like an oversight.
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dashboard
+    environment:
+      API_BASE_URL: http://api:8000
+      API_KEY: ${API_KEY}
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
