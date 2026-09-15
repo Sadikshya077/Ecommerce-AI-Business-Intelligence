@@ -1,0 +1,18 @@
+# docker/Dockerfile.mlflow
+FROM python:3.13-slim
+
+WORKDIR /mlflow
+
+RUN pip install --no-cache-dir mlflow
+
+EXPOSE 5000
+
+# Serves the same SQLite tracking store the training scripts (Phase 4)
+# already write to via mlflow.set_tracking_uri("sqlite:///mlflow/mlflow.db")
+# -- this just adds a UI on top of it, it doesn't change where experiments
+# get logged.
+CMD ["mlflow", "server", \
+     "--backend-store-uri", "sqlite:////mlflow/mlflow.db", \
+     "--default-artifact-root", "/mlflow/mlartifacts", \
+     "--host", "0.0.0.0", \
+     "--port", "5000"]
