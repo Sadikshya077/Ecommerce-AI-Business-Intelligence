@@ -96,6 +96,7 @@ Ecommerce-AI-Business-Intelligence/
 |   |-- routers/                   # health, customers, segments, churn, clv, insights, narrative, forecast
 |   |-- schemas/                   # Pydantic request/response contracts
 |   |-- services/                  # business logic layer
+|   |-- requirements.txt           # API service dependencies
 |-- llm/                           # Grounded LLM narration
 |   |-- config.py, prompts.py, client.py, schemas.py, faithfulness.py, narrator.py
 |   |-- evaluation/                # stratified sampling + manual scoring tools
@@ -105,15 +106,13 @@ Ecommerce-AI-Business-Intelligence/
 |   |-- app.py                     # Overview
 |   |-- pages/                     # Segment Explorer, Churn Risk, Customer Value,
 |   |                                Sales Forecast, Customer 360
+|   |-- requirements.txt           # Dashboard dependencies
 |-- docker/                        # Dockerfiles for api, dashboard, mlflow
 |-- reports/                       # methodology writeups, figures, LLM evaluation
 |-- tests/                         # automated test suite
 |-- docker-compose.yml
 |-- .env.example
 |-- pytest.ini
-|-- requirements.api.txt           # API service dependencies
-|-- requirements.dashboard.txt     # Dashboard dependencies
-|-- requirements.txt
 |-- README.md
 ```
 
@@ -142,13 +141,37 @@ Edit `.env` with your PostgreSQL credentials, a generated `API_KEY`, and your `G
 docker compose up --build
 ```
 
-Pre-built images are also available on Docker Hub (`rubysah32/ecommerce-ai-api`, `rubysah32/ecommerce-ai-dashboard`, `rubysah32/ecommerce-ai-mlflow`) for direct use without a local build.
+Pre-built images are also published on Docker Hub -- `rubysah32/ecommerce-ai-api`, `rubysah32/ecommerce-ai-dashboard`, and `rubysah32/ecommerce-ai-mlflow` -- for running the stack without cloning or building anything. See "Running from Docker Hub images only" below.
 
 - API: `http://localhost:8000/docs`
 - Dashboard: `http://localhost:8501`
 - MLflow: `http://localhost:5000`
 
 The offline analytical pipeline (ETL through SHAP) is intentionally not part of the always-on Compose services -- it runs as a deliberate, inspectable sequence of scripts against the `postgres` service (its port is published to the host), populating `data/processed/`, which the `api` service reads via a mounted volume.
+
+### Running from Docker Hub images only
+
+This works without cloning the repository or building anything -- three published images plus the official `postgres:16` image are all that's needed.
+
+**What you still need**, even with pre-built images:
+- A `.env` file (same variables as `.env.example`: `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, `API_KEY`, `GEMINI_API_KEY`)
+- A populated `data/processed/` folder. This is the output of the project's offline analytical pipeline (ETL through SHAP) and is deliberately **not baked into the `api` image** -- keeping the image lean and the pipeline a separate, inspectable step is a design choice, not an oversight. Without it, the containers start and stay healthy, but `/ready` reports no data and customer endpoints return empty results. Obtain this folder either by running the pipeline once (see "Running locally without Docker" above) against the `postgres` container below, or by copying a `data/processed/` folder from someone who already has one.
+
+**Steps:**
+
+1. Create a working folder containing `.env` and, once available, a `data/processed/` subfolder.
+2. Save the compose file below as `docker-compose.images.yml` in that same folder.
+3. Run:
+   ```powershell
+   docker compose -f docker-compose.images.yml up
+   ```
+
+`postgres` and `mlflow` have no functional dependency from `api` at request time -- the API only ever reads the `data/processed/` volume above, it never queries either live. Both remain in this file because they're part of the documented architecture (and `postgres` is needed if you intend to run the offline pipeline against this same stack), not because `api` talks to them per request.
+
+Once running:
+- API: `http://localhost:8000/docs`
+- Dashboard: `http://localhost:8501`
+- MLflow: `http://localhost:5000`
 
 ### Running locally without Docker
 
@@ -216,6 +239,3 @@ All endpoints except `/health` and `/ready` require an `X-API-Key` header and li
 
 Interactive documentation is available at `/docs` once the API is running.
 
-## License
-
-Academic project -- Institute of Engineering (IOE), Thapathali Campus.

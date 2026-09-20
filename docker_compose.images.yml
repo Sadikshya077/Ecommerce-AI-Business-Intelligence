@@ -1,0 +1,60 @@
+# docker-compose.images.yml
+#
+# Runs the full stack from pre-built images on Docker Hub -- no local
+# build and no project source code required. Needs only Docker, this
+# file, a .env alongside it, and a populated data/processed/ folder
+# (see README "Running with Docker Hub images only" for why).
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devpass}
+      POSTGRES_DB: ${POSTGRES_DB:-ecommerce_bi}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mlflow:
+    image: rubysah32/ecommerce-ai-mlflow:latest
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow_data:/mlflow
+
+  api:
+    image: rubysah32/ecommerce-ai-api:latest
+    environment:
+      API_KEY: ${API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      LLM_MODEL: ${LLM_MODEL:-gemini-3.6-flash}
+      LLM_TIMEOUT_SECONDS: ${LLM_TIMEOUT_SECONDS:-20}
+      LLM_MAX_RETRIES: ${LLM_MAX_RETRIES:-2}
+      CORS_ORIGINS: http://dashboard:8501,http://localhost:8501
+    ports:
+      - "8000:8000"
+    volumes:
+      # Bind-mounted from a local data/processed/ folder placed next to
+      # this file -- not baked into the image. See README for why.
+      - ./data/processed:/app/data:ro
+
+  dashboard:
+    image: rubysah32/ecommerce-ai-dashboard:latest
+    environment:
+      API_BASE_URL: http://api:8000
+      API_KEY: ${API_KEY}
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
+  mlflow_data:
