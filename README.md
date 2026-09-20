@@ -110,6 +110,7 @@ Ecommerce-AI-Business-Intelligence/
 |-- docker/                        # Dockerfiles for api, dashboard, mlflow
 |-- reports/                       # methodology writeups, figures, LLM evaluation
 |-- tests/                         # automated test suite
+|-- docker_compose.images
 |-- docker-compose.yml
 |-- .env.example
 |-- pytest.ini
